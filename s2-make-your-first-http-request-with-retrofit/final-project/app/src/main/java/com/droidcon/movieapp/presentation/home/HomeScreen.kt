@@ -33,6 +33,7 @@ import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -49,6 +50,8 @@ import coil.compose.AsyncImage
 import com.droidcon.movieapp.R
 import com.droidcon.movieapp.common.UiEvents
 import com.droidcon.movieapp.data.remote.MoviesResponse
+import com.droidcon.movieapp.presentation.components.ErrorComponent
+import com.droidcon.movieapp.presentation.components.LoadingComponent
 import com.droidcon.movieapp.presentation.ui.theme.MovieAppTheme
 import kotlinx.coroutines.flow.collectLatest
 
@@ -63,6 +66,7 @@ fun HomeScreen(
 
     /** Observing UiEvents and if it SnackBarEvent it will show a SnackBar with a message if state is an error*/
     LaunchedEffect(key1 = true) {
+        moviesViewModel.getPopularMovies()
         moviesViewModel.eventFlow.collectLatest { event ->
             when (event) {
                 is UiEvents.SnackBarEvent -> {
@@ -87,61 +91,75 @@ fun HomeScreen(
                     .fillMaxSize()
                     .background(Color(0XFF080C2C)),
             ) {
-                LazyVerticalGrid(
-                    columns = GridCells.Fixed(spanCount),
-                    contentPadding = PaddingValues(16.dp),
-                ) {
-                    item(
-                        span = {
-                            GridItemSpan(spanCount)
-                        },
-                    ) {
-                        SearchMovieTextField(
-                            setTypedMovie = { typedMovie ->
-                                moviesViewModel.setTypedMovie(
-                                    typedMovie = typedMovie,
-                                )
-                            },
-                            typedMovie = moviesUiState.typedMovie,
-                            onClearClicked = {
-                                moviesViewModel.setTypedMovie("")
-                                moviesViewModel.getPopularMovies()
-                            },
-                            searchMovie = {
-                                moviesViewModel.searchMovie()
-                            },
-                        )
+                if (moviesUiState.isLoading) {
+                    Box(modifier = Modifier.align(Alignment.Center)) {
+                        LoadingComponent()
                     }
+                }
 
-                    item(
-                        span = {
-                            GridItemSpan(spanCount)
-                        },
+                if (!moviesUiState.isLoading && moviesUiState.errorMessage.isNotEmpty()) {
+                    Box(modifier = Modifier.align(Alignment.Center)) {
+                        ErrorComponent(errorMessage = moviesUiState.errorMessage)
+                    }
+                }
+
+                if (!moviesUiState.isLoading && moviesUiState.movies.isNotEmpty()) {
+                    LazyVerticalGrid(
+                        columns = GridCells.Fixed(spanCount),
+                        contentPadding = PaddingValues(16.dp),
                     ) {
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(
-                                    top = 24.dp,
-                                    bottom = 16.dp,
-                                ),
-                            horizontalArrangement = Arrangement.SpaceBetween,
+                        item(
+                            span = {
+                                GridItemSpan(spanCount)
+                            },
                         ) {
-                            Text("Popular Movies", color = Color.White, fontSize = 16.sp)
-
-                            Text("See more", color = Color.LightGray, fontSize = 12.sp)
+                            SearchMovieTextField(
+                                setTypedMovie = { typedMovie ->
+                                    moviesViewModel.setTypedMovie(
+                                        typedMovie = typedMovie,
+                                    )
+                                },
+                                typedMovie = moviesUiState.typedMovie,
+                                onClearClicked = {
+                                    moviesViewModel.setTypedMovie("")
+                                    moviesViewModel.getPopularMovies()
+                                },
+                                searchMovie = {
+                                    moviesViewModel.searchMovie()
+                                },
+                            )
                         }
-                    }
 
-                    items(movies) { movie ->
-                        MovieComponent(
-                            image = movie.moviePosterUrl.orEmpty(),
-                            title = movie.title.orEmpty(),
-                            rating = movie.averageVote,
-                            navigateToDetailScreen = {
-                                navigateToDetailsScreen(movie.id.toString())
+                        item(
+                            span = {
+                                GridItemSpan(spanCount)
                             },
-                        )
+                        ) {
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(
+                                        top = 24.dp,
+                                        bottom = 16.dp,
+                                    ),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                            ) {
+                                Text("Popular Movies", color = Color.White, fontSize = 16.sp)
+
+                                Text("See more", color = Color.LightGray, fontSize = 12.sp)
+                            }
+                        }
+
+                        items(moviesUiState.movies) { movie ->
+                            MovieComponent(
+                                image = movie.moviePosterUrl.orEmpty(),
+                                title = movie.title.orEmpty(),
+                                rating = movie.averageVote,
+                                navigateToDetailScreen = {
+                                    navigateToDetailsScreen(movie.id.toString())
+                                },
+                            )
+                        }
                     }
                 }
             }

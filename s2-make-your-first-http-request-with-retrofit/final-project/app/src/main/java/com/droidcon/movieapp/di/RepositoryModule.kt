@@ -22,6 +22,6 @@ object RepositoryModule {
     fun provideMoviesRepository(
         TMDBApi: TMDBApi,
     ): MoviesRepository {
-        return MoviesRepositoryImpl()
+        return MoviesRepositoryImpl(TMDBApi = TMDBApi)
     }
 }

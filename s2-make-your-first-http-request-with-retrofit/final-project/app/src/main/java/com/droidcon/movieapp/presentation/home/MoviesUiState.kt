@@ -8,7 +8,7 @@ import com.droidcon.movieapp.data.remote.MoviesResponse
  */
 data class MoviesUiState(
     val isLoading: Boolean = false,
-    val movies: List<MoviesResponse.MovieDetails>? = null,
-    val errorMessage: String? = null,
+    val movies: List<MoviesResponse.MovieDetails> = emptyList(),
+    val errorMessage: String = "",
     val typedMovie: String = "",
 )
