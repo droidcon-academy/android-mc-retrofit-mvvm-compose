@@ -2,6 +2,7 @@ package com.droidcon.movieapp.presentation.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.droidcon.movieapp.common.PLEASE_ENTER_NAME_OF_MOVIE
 import com.droidcon.movieapp.common.Resource
 import com.droidcon.movieapp.common.SOMETHING_WENT_WRONG
 import com.droidcon.movieapp.common.UiEvents
@@ -22,7 +23,7 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class MoviesViewModel @Inject constructor(
-    private val moviesRepository: MoviesRepository
+    private val moviesRepository: MoviesRepository,
 ) : ViewModel() {
 
     /**
@@ -95,7 +96,67 @@ class MoviesViewModel @Inject constructor(
      * then based on the response gotten it will update the UI states accordingly.
      * Encase of an error it will send a SnackBar event to show an error message on the screen
      */
-    fun searchMovie() {}
+    fun searchMovie() {
+        viewModelScope.launch {
+            _moviesUiState.value =
+                moviesUiState.value.copy(
+                    isLoading = true,
+                )
 
-    fun setTypedMovie(typedMovie: String) {}
+            val typedMovie = moviesUiState.value.typedMovie
+
+            if (typedMovie != "") {
+                moviesRepository.searchMovie(name = typedMovie).collect { result ->
+                    when (result) {
+                        is Resource.Success -> {
+                            val searchedMovies = result.data?.results?.map {
+                                it.copy(
+                                    averageVote = it.averageVote?.roundOffDecimal(),
+                                    moviePosterUrl = "https://image.tmdb.org/t/p/w220_and_h330_face/${it.moviePosterUrl}",
+                                )
+                            }
+
+                            _moviesUiState.value = moviesUiState.value.copy(
+                                isLoading = false,
+                                movies = searchedMovies ?: emptyList(),
+                            )
+                        }
+
+                        is Resource.Error -> {
+                            _moviesUiState.value = moviesUiState.value.copy(
+                                isLoading = false,
+                                errorMessage = result.message ?: SOMETHING_WENT_WRONG,
+                            )
+
+                            _eventFlow.emit(
+                                UiEvents.SnackBarEvent(
+                                    message = result.message ?: SOMETHING_WENT_WRONG,
+                                ),
+                            )
+                        }
+
+                        else -> {
+                            moviesUiState
+                        }
+                    }
+                }
+            } else {
+                _eventFlow.emit(
+                    UiEvents.SnackBarEvent(
+                        message = PLEASE_ENTER_NAME_OF_MOVIE,
+                    ),
+                )
+
+                _moviesUiState.value = moviesUiState.value.copy(
+                    isLoading = false,
+                )
+            }
+        }
+    }
+
+    fun setTypedMovie(typedMovie: String) {
+        _moviesUiState.value = moviesUiState.value.copy(
+            typedMovie = typedMovie,
+        )
+    }
 }

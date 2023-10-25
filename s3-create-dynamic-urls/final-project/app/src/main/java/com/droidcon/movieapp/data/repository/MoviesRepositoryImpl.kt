@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import javax.inject.Inject
 
-class MoviesRepositoryImpl @Inject constructor(private val TMDBApi: TMDBApi): MoviesRepository {
+class MoviesRepositoryImpl @Inject constructor(private val TMDBApi: TMDBApi) : MoviesRepository {
     override fun getPopularMovies(): Flow<Resource<MoviesResponse>> = flow {
         val response = TMDBApi.getPopularMovies()
 
@@ -22,15 +22,27 @@ class MoviesRepositoryImpl @Inject constructor(private val TMDBApi: TMDBApi): Mo
         }
     }.flowOn(Dispatchers.IO)
 
-    override fun searchMovie(name: String): Flow<Resource<MoviesResponse>> {
-        TODO("Not yet implemented")
-    }
+    override fun searchMovie(name: String): Flow<Resource<MoviesResponse>> = flow {
+        val response = TMDBApi.searchMovie(movieName = name)
 
-    override fun getMovieDetails(movieId: Int): Flow<Resource<MoviesResponse.MovieDetails>> {
-        TODO("Not yet implemented")
-    }
+        if (response.isSuccessful) {
+            emit(Resource.Success(data = response.body()))
+        } else {
+            val errorMessage = response.errorBody()?.string() ?: UNKNOWN_ERROR_OCCURRED
 
-    override fun getSimilarMovies(movieId: Int): Flow<Resource<MoviesResponse>> {
-        TODO("Not yet implemented")
-    }
+            emit(Resource.Error(message = errorMessage))
+        }
+    }.flowOn(Dispatchers.IO)
+
+    override fun getMovieDetails(movieId: Int): Flow<Resource<MoviesResponse.MovieDetails>> = flow {
+        val response = TMDBApi.getMovieDetails(movieId = movieId)
+
+        if (response.isSuccessful) {
+            emit(Resource.Success(data = response.body()))
+        } else {
+            val errorMessage = response.errorBody()?.string() ?: UNKNOWN_ERROR_OCCURRED
+
+            emit(Resource.Error(message = errorMessage))
+        }
+    }.flowOn(Dispatchers.IO)
 }

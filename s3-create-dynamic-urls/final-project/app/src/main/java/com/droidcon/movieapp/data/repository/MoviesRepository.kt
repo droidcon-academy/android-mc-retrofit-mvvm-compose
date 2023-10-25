@@ -14,7 +14,4 @@ interface MoviesRepository {
 
     /** This function gets more details about a movie from the TMDB api */
     fun getMovieDetails(movieId: Int): Flow<Resource<MoviesResponse.MovieDetails>>
-
-    /** This function gets a list of similar movies from the TMDB api */
-    fun getSimilarMovies(movieId: Int): Flow<Resource<MoviesResponse>>
 }
