@@ -1,2 +1,2 @@
 # Study materials and source code for **Droidcon Academy** course 
-> # Add Course Name 
+> # Android Retrofit Fundamentals with MVVM and Jetpack Compose 
