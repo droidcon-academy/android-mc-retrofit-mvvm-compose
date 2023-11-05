@@ -27,6 +27,7 @@ interface TMDBApi {
         @Query("api_key") apiKey: String = "aa90004b9c2baa5fa2306c25aa6d3af4",
     ): Response<MoviesResponse.MovieDetails>
 
+    /** This endpoint gets similar movies by movie ID */
     @GET("/3/movie/{movie_id}/similar")
     suspend fun getSimilarMovies(
         @Path("movie_id") movieId: Int,

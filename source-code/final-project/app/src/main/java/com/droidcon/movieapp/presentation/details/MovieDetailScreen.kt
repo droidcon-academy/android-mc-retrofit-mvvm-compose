@@ -91,7 +91,7 @@ fun MovieDetailScreen(
                     }
                 }
 
-                if (!moviesDetailsUiState.isLoading && moviesDetailsUiState.errorMessage != null) {
+                if (!moviesDetailsUiState.isLoading && moviesDetailsUiState.errorMessage.isNotEmpty()) {
                     Box(modifier = Modifier.align(Alignment.Center)) {
                         ErrorComponent(errorMessage = moviesDetailsUiState.errorMessage)
                     }

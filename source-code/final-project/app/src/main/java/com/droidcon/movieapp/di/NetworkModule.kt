@@ -17,7 +17,7 @@ import javax.inject.Singleton
 object NetworkModule {
 
     /** This function creates an OKHttp client that will be used to create a Retrofit instance */
-    private fun loggingInterceptor(): OkHttpClient {
+    private fun okhttpClient(): OkHttpClient {
         val loggingInterceptor = HttpLoggingInterceptor()
 
         loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY)
@@ -39,7 +39,7 @@ object NetworkModule {
                 "https://api.themoviedb.org",
             )
             .addConverterFactory(GsonConverterFactory.create())
-            .client(loggingInterceptor())
+            .client(okhttpClient())
             .build()
     }
 

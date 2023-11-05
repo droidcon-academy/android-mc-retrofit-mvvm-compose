@@ -10,7 +10,7 @@ data class MovieDetailsUiState(
     val isLoading: Boolean = false,
     val movieDetails: MovieDetailsUi? = null,
     val similarMovies: List<MoviesResponse.MovieDetails> = emptyList(),
-    val errorMessage: String? = null,
+    val errorMessage: String = "",
 )
 
 data class MovieDetailsUi(

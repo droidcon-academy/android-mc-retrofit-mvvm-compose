@@ -53,7 +53,7 @@ class MoviesRepositoryImpl @Inject constructor(private val TMDBApi: TMDBApi) : M
     }.flowOn(Dispatchers.IO)
 
     override fun getSimilarMovies(movieId: Int): Flow<Resource<MoviesResponse>> =
-        flow<Resource<MoviesResponse>> {
+        flow {
             val response = TMDBApi.getSimilarMovies(movieId = movieId)
 
             if (response.isSuccessful) {
