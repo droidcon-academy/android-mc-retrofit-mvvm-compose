@@ -3,16 +3,17 @@ plugins {
     id 'org.jetbrains.kotlin.android'
     id 'kotlin-kapt'
     id 'com.google.dagger.hilt.android'
+    id 'org.jetbrains.kotlin.plugin.compose' version "2.0.0"
 }
 
 android {
     namespace 'com.droidcon.retrofitposts'
-    compileSdk 33
+    compileSdk 35
 
     defaultConfig {
         applicationId "com.droidcon.retrofitposts"
         minSdk 21
-        targetSdk 33
+        targetSdk 35
         versionCode 1
         versionName "1.0"
 
@@ -76,8 +77,8 @@ dependencies {
     implementation "com.squareup.okhttp3:okhttp:4.10.0"
 
     // Hilt
-    implementation "com.google.dagger:hilt-android:2.44"
-    kapt "com.google.dagger:hilt-compiler:2.44"
+    implementation "com.google.dagger:hilt-android:2.51.1"
+    kapt "com.google.dagger:hilt-compiler:2.51.1"
 
     // Coroutines
     implementation"org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4"
